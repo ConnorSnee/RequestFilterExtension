@@ -1,6 +1,7 @@
 package burp;
 
-public class BurpExtender implements IBurpExtender, IHttpListener {
+public class BurpExtender implements IBurpExtender, IProxyListener {
+	
 	
 	private static final String[] HOSTS_FROM = {"google.com", "facebook.com"};
 	
@@ -11,16 +12,17 @@ public class BurpExtender implements IBurpExtender, IHttpListener {
 		helpers = callbacks.getHelpers();
 		
 		callbacks.setExtensionName("Request Filter");
-		callbacks.registerHttpListener(this);
+		callbacks.registerProxyListener(this);
 	}
-	
+
 	@Override
-	public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
+	public void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message) {
 		if (messageIsRequest) {
+			IHttpRequestResponse messageInfo = message.getMessageInfo();
 			IHttpService httpService = messageInfo.getHttpService();
 			for (String s : HOSTS_FROM) {
 				if (httpService.getHost().toLowerCase().contains(s)) {
-					messageInfo.setHttpService(helpers.buildHttpService(null, httpService.getPort(), httpService.getProtocol()));
+					message.setInterceptAction(IInterceptedProxyMessage.ACTION_DROP);
 				}
 			}
 		}
