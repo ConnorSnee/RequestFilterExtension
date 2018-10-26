@@ -45,8 +45,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, ITab {
 					public void actionPerformed(ActionEvent ae) {
 						String hostName = JOptionPane.showInputDialog("Enter a host");
 						if (!hostName.isEmpty()) {
-							HostTableModel t = (HostTableModel) filterTable.getModel();
-							t.addRow(hostName);
+							tableModel.addRow(hostName);
 						}
 					}
 				});
@@ -57,7 +56,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, ITab {
 						int selected = filterTable.getSelectedRow();
 						String hostName = JOptionPane.showInputDialog("Enter a host", filterTable.getModel().getValueAt(selected, 1));
 						if (!hostName.isEmpty()) {
-							filterTable.getModel().setValueAt(hostName, selected, 1);
+							tableModel.setValueAt(hostName, selected, 1);
 						}
 					}
 				});
@@ -66,8 +65,7 @@ public class BurpExtender implements IBurpExtender, IProxyListener, ITab {
 					@Override
 					public void actionPerformed(ActionEvent ae) {
 						int selected = filterTable.getSelectedRow();
-						HostTableModel tm = (HostTableModel) filterTable.getModel();
-						tm.removeRow(selected);
+						tableModel.removeRow(selected);
 					}
 				});
 				
