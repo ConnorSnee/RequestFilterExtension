@@ -19,9 +19,11 @@ public class BurpExtender implements IBurpExtender, IProxyListener, ITab {
 	
 	private JPanel panel;
 	private JTable filterTable;
+	private IBurpExtenderCallbacks callbacks;
 	
 	@Override
 	public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
+		this.callbacks = callbacks;
 		callbacks.setExtensionName("Request Filter");
 		callbacks.registerProxyListener(this);
 		
@@ -84,11 +86,22 @@ public class BurpExtender implements IBurpExtender, IProxyListener, ITab {
 
 	@Override
 	public void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message) {
+		//commented lines filter on host only - uncommented lines filter more specifically
 		if (messageIsRequest) {
-			IHttpService httpService = message.getMessageInfo().getHttpService();
+			IHttpRequestResponse httpService = message.getMessageInfo();
+			IRequestInfo info = callbacks.getHelpers().analyzeRequest(httpService);
+			//IHttpService httpService = message.getMessageInfo().getHttpService();
 			HostTableModel table = (HostTableModel) filterTable.getModel();
-			if (table.getHosts().parallelStream()
+			/*if (table.getHosts().parallelStream()
 					.filter(host -> httpService.getHost().toLowerCase().contains(((String)host.getValueAt(1)).toLowerCase())
+							&& (Boolean)host.getValueAt(0))
+					.findFirst()
+					.isPresent()) {
+				message.setInterceptAction(IInterceptedProxyMessage.ACTION_DROP);*/
+			//callbacks.printOutput(info.getUrl().toString());
+			//callbacks.printOutput((String)host.getValueAt(1));
+			if (table.getHosts().parallelStream()
+					.filter(host -> info.getUrl().toString().toLowerCase().contains(((String)host.getValueAt(1)).toLowerCase())
 							&& (Boolean)host.getValueAt(0))
 					.findFirst()
 					.isPresent()) {
